@@ -11,13 +11,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.11"
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          java-version: "17"
+          distribution: "temurin"
 
       - name: Install Buildozer
         run: |
@@ -29,38 +35,14 @@ jobs:
 
       - name: Configure Buildozer
         run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          p = Path("buildozer.spec")
-          text = p.read_text()
-
-          replacements = {
-              "title = My Application": "title = JARVIS",
-              "package.name = myapp": "package.name = jarvis",
-              "package.domain = org.test": "package.domain = org.jarvis",
-              "requirements = python3,kivy": "requirements = python3,kivy",
-              "orientation = portrait": "orientation = portrait",
-          }
-
-          for old, new in replacements.items():
-              text = text.replace(old, new)
-
-          lines = text.splitlines()
-          output = []
-
-          for line in lines:
-              if line.startswith("# android.permissions ="):
-                  output.append("android.permissions = INTERNET,RECORD_AUDIO")
-              else:
-                  output.append(line)
-
-          p.write_text("\n".join(output) + "\n")
-          PY
+          sed -i 's/title = My Application/title = JARVIS/' buildozer.spec
+          sed -i 's/package.name = myapp/package.name = jarvis/' buildozer.spec
+          sed -i 's/package.domain = org.test/package.domain = org.jarvis/' buildozer.spec
+          sed -i 's/# android.permissions =/android.permissions = INTERNET,RECORD_AUDIO/' buildozer.spec
 
       - name: Build APK
         run: |
-          yes | buildozer -v android debug
+          buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
