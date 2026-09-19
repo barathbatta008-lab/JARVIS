@@ -8,9 +8,9 @@ import ast
 import operator
 
 
-# -------------------------
+# =========================
 # SAFE CALCULATOR
-# -------------------------
+# =========================
 
 OPERATORS = {
     ast.Add: operator.add,
@@ -38,6 +38,7 @@ def calculate(expression):
                 raise ValueError()
 
             if isinstance(node, ast.BinOp):
+
                 operation = OPERATORS.get(type(node.op))
 
                 if operation is None:
@@ -46,6 +47,7 @@ def calculate(expression):
                 left = solve(node.left)
                 right = solve(node.right)
 
+                # Safety limit for powers
                 if isinstance(node.op, ast.Pow) and abs(right) > 10:
                     raise ValueError()
 
@@ -74,9 +76,9 @@ def calculate(expression):
         return "I could not calculate that."
 
 
-# -------------------------
-# JARVIS
-# -------------------------
+# =========================
+# JARVIS APP
+# =========================
 
 class JarvisApp(App):
 
@@ -88,6 +90,7 @@ class JarvisApp(App):
             spacing=12
         )
 
+        # TITLE
         title = Label(
             text="J.A.R.V.I.S",
             font_size=32,
@@ -97,6 +100,7 @@ class JarvisApp(App):
 
         layout.add_widget(title)
 
+        # STATUS
         status = Label(
             text="SYSTEM ONLINE",
             font_size=18,
@@ -106,6 +110,7 @@ class JarvisApp(App):
 
         layout.add_widget(status)
 
+        # RESPONSE AREA
         self.reply = Label(
             text=(
                 "Hello. I am JARVIS.\n\n"
@@ -113,6 +118,7 @@ class JarvisApp(App):
                 "Try:\n"
                 "VLSI\n"
                 "ECE\n"
+                "CSE\n"
                 "robotics\n"
                 "drone\n"
                 "coding\n"
@@ -132,6 +138,7 @@ class JarvisApp(App):
 
         layout.add_widget(self.reply)
 
+        # COMMAND BOX
         self.command = TextInput(
             hint_text="Type a command...",
             multiline=False,
@@ -146,6 +153,7 @@ class JarvisApp(App):
 
         layout.add_widget(self.command)
 
+        # SEND BUTTON
         button = Button(
             text="SEND",
             font_size=20,
@@ -161,9 +169,9 @@ class JarvisApp(App):
 
         return layout
 
-    # -------------------------
-    # COMMAND PROCESSOR
-    # -------------------------
+    # =========================
+    # PROCESS COMMAND
+    # =========================
 
     def process_command(self, instance):
 
@@ -180,13 +188,16 @@ class JarvisApp(App):
 
         self.speak(response)
 
-    # -------------------------
+    # =========================
     # JARVIS BRAIN
-    # -------------------------
+    # =========================
 
     def get_response(self, command):
 
+        # -------------------------
         # GREETING
+        # -------------------------
+
         if command in [
             "hi",
             "hello",
@@ -200,32 +211,50 @@ class JarvisApp(App):
                 "How can I assist you?"
             )
 
+        # -------------------------
         # IDENTITY
+        # -------------------------
+
         if "who are you" in command:
 
             return (
                 "I am JARVIS, your personal AI assistant."
             )
 
+        # -------------------------
         # TIME
+        # -------------------------
+
         if command == "time" or "what time" in command:
 
             current_time = datetime.now().strftime(
                 "%I:%M %p"
             )
 
-            return "The current time is " + current_time
+            return (
+                "The current time is "
+                + current_time
+            )
 
+        # -------------------------
         # DATE
+        # -------------------------
+
         if command == "date" or "today" in command:
 
             current_date = datetime.now().strftime(
                 "%d %B %Y"
             )
 
-            return "Today's date is " + current_date
+            return (
+                "Today's date is "
+                + current_date
+            )
 
+        # -------------------------
         # VLSI
+        # -------------------------
+
         if "vlsi" in command:
 
             return (
@@ -243,7 +272,10 @@ class JarvisApp(App):
                 "• VLSI calculations"
             )
 
+        # -------------------------
         # ECE
+        # -------------------------
+
         if command == "ece" or "electronics" in command:
 
             return (
@@ -259,8 +291,43 @@ class JarvisApp(App):
                 "• Embedded systems"
             )
 
+        # -------------------------
+        # CSE
+        # -------------------------
+
+        if (
+            command == "cse"
+            or "computer science" in command
+            or "computer science engineering" in command
+        ):
+
+            return (
+                "CSE Specialist activated.\n\n"
+                "I can help with:\n"
+                "• Python programming\n"
+                "• C programming\n"
+                "• C++ programming\n"
+                "• Java basics\n"
+                "• Data structures\n"
+                "• Algorithms\n"
+                "• Object-oriented programming\n"
+                "• Databases\n"
+                "• Operating systems\n"
+                "• Computer networks\n"
+                "• Web development\n"
+                "• AI and machine learning\n"
+                "• Software engineering"
+            )
+
+        # -------------------------
         # ROBOTICS
-        if "robotics" in command or "robot" in command:
+        # -------------------------
+
+        if (
+            "robotics" in command
+            or command == "robot"
+            or "robot" in command
+        ):
 
             return (
                 "Robotics Specialist activated.\n\n"
@@ -273,7 +340,10 @@ class JarvisApp(App):
                 "• Robot navigation"
             )
 
+        # -------------------------
         # DRONE EDUCATION
+        # -------------------------
+
         if "drone" in command:
 
             return (
@@ -293,7 +363,10 @@ class JarvisApp(App):
                 "educational and legal uses."
             )
 
+        # -------------------------
         # CODING
+        # -------------------------
+
         if (
             "coding" in command
             or "programming" in command
@@ -313,7 +386,10 @@ class JarvisApp(App):
                 "• AI programming"
             )
 
+        # -------------------------
         # CALCULATOR
+        # -------------------------
+
         if command.startswith("calculate "):
 
             expression = command.replace(
@@ -327,7 +403,10 @@ class JarvisApp(App):
                 + calculate(expression)
             )
 
+        # -------------------------
         # SIMPLE CALCULATION
+        # -------------------------
+
         if all(
             character in "0123456789+-*/(). %"
             for character in command
@@ -338,13 +417,20 @@ class JarvisApp(App):
                 + calculate(command)
             )
 
+        # -------------------------
         # HELP
-        if command == "help" or "what can you do" in command:
+        # -------------------------
+
+        if (
+            command == "help"
+            or "what can you do" in command
+        ):
 
             return (
                 "JARVIS command center:\n\n"
                 "VLSI\n"
                 "ECE\n"
+                "CSE\n"
                 "robotics\n"
                 "drone\n"
                 "coding\n"
@@ -354,18 +440,21 @@ class JarvisApp(App):
                 "hello"
             )
 
-        # UNKNOWN
+        # -------------------------
+        # UNKNOWN COMMAND
+        # -------------------------
+
         return (
             "I received your command:\n\n"
             + command
             + "\n\n"
-            "Try VLSI, ECE, robotics, drone, "
-            "coding, time, date or help."
+            "Try VLSI, ECE, CSE, robotics, "
+            "drone, coding, time, date or help."
         )
 
-    # -------------------------
+    # =========================
     # ANDROID VOICE
-    # -------------------------
+    # =========================
 
     def speak(self, text):
 
@@ -403,9 +492,9 @@ class JarvisApp(App):
             pass
 
 
-# -------------------------
+# =========================
 # START JARVIS
-# -------------------------
+# =========================
 
 if __name__ == "__main__":
     JarvisApp().run()
