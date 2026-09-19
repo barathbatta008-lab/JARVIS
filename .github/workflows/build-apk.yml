@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+env:
+  PYTHONFORANDROID_PREREQUISITES_INSTALL_INTERACTIVE: 0
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,14 +34,17 @@ jobs:
           pip install buildozer cython
 
       - name: Create Buildozer spec
-        run: buildozer init
+        run: |
+          buildozer init
 
       - name: Configure Buildozer
         run: |
           sed -i 's/title = My Application/title = JARVIS/' buildozer.spec
           sed -i 's/package.name = myapp/package.name = jarvis/' buildozer.spec
           sed -i 's/package.domain = org.test/package.domain = org.jarvis/' buildozer.spec
-          sed -i 's/# android.permissions =/android.permissions = INTERNET,RECORD_AUDIO/' buildozer.spec
+          sed -i 's/# android.permissions =/android.permissions = android.permission.INTERNET,android.permission.RECORD_AUDIO/' buildozer.spec
+          sed -i 's/# android.accept_sdk_license = False/android.accept_sdk_license = True/' buildozer.spec
+          sed -i 's/orientation = portrait/orientation = portrait/' buildozer.spec
 
       - name: Build APK
         run: |
