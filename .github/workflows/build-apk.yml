@@ -7,13 +7,15 @@ on:
       - main
 
 env:
-  PYTHONFORANDROID_PREREQUISITES_INSTALL_INTERACTIVE: 0
+  PYTHONFORANDROID_PREREQUISITES_INSTALL_INTERACTIVE: "0"
+  APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -28,6 +30,27 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git \
+            zip \
+            unzip \
+            autoconf \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses5-dev \
+            libncursesw5-dev \
+            libtinfo6 \
+            cmake \
+            libffi-dev \
+            libssl-dev \
+            automake \
+            autopoint \
+            gettext
+
       - name: Install Buildozer
         run: |
           python -m pip install --upgrade pip
@@ -39,12 +62,47 @@ jobs:
 
       - name: Configure Buildozer
         run: |
-          sed -i 's/title = My Application/title = JARVIS/' buildozer.spec
-          sed -i 's/package.name = myapp/package.name = jarvis/' buildozer.spec
-          sed -i 's/package.domain = org.test/package.domain = org.jarvis/' buildozer.spec
-          sed -i 's/# android.permissions =/android.permissions = android.permission.INTERNET,android.permission.RECORD_AUDIO/' buildozer.spec
-          sed -i 's/# android.accept_sdk_license = False/android.accept_sdk_license = True/' buildozer.spec
-          sed -i 's/orientation = portrait/orientation = portrait/' buildozer.spec
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path("buildozer.spec")
+          text = p.read_text()
+
+          text = text.replace(
+              "title = My Application",
+              "title = JARVIS"
+          )
+
+          text = text.replace(
+              "package.name = myapp",
+              "package.name = jarvis"
+          )
+
+          text = text.replace(
+              "package.domain = org.test",
+              "package.domain = org.jarvis"
+          )
+
+          text = text.replace(
+              "# android.accept_sdk_license = False",
+              "android.accept_sdk_license = True"
+          )
+
+          text = text.replace(
+              "# android.permissions =",
+              "android.permissions = INTERNET,RECORD_AUDIO"
+          )
+
+          text = text.replace(
+              "# orientation = portrait",
+              "orientation = portrait"
+          )
+
+          p.write_text(text)
+          PY
+
+          echo "===== Buildozer configuration ====="
+          grep -E "^(title|package.name|package.domain|android.accept_sdk_license|android.permissions|orientation)" buildozer.spec || true
 
       - name: Build APK
         run: |
@@ -55,3 +113,4 @@ jobs:
         with:
           name: JARVIS-APK
           path: bin/*.apk
+          if-no-files-found: error
