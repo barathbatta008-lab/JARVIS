@@ -3,16 +3,14 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
-from kivy.clock import Clock
 from datetime import datetime
-
 import ast
 import operator
 
 
-# ============================================================
-# SAFE CALCULATOR
-# ============================================================
+# -----------------------------
+# Safe Calculator
+# -----------------------------
 
 OPERATORS = {
     ast.Add: operator.add,
@@ -48,7 +46,6 @@ def calculate(expression):
                 left = solve(node.left)
                 right = solve(node.right)
 
-                # Prevent extremely large powers
                 if isinstance(node.op, ast.Pow) and abs(right) > 10:
                     raise ValueError()
 
@@ -77,9 +74,9 @@ def calculate(expression):
         return "I could not calculate that."
 
 
-# ============================================================
-# JARVIS APP
-# ============================================================
+# -----------------------------
+# JARVIS
+# -----------------------------
 
 class JarvisApp(App):
 
@@ -91,10 +88,7 @@ class JarvisApp(App):
             spacing=12
         )
 
-        # ----------------------------------------------------
-        # TITLE
-        # ----------------------------------------------------
-
+        # Title
         title = Label(
             text="J.A.R.V.I.S",
             font_size=32,
@@ -104,10 +98,7 @@ class JarvisApp(App):
 
         layout.add_widget(title)
 
-        # ----------------------------------------------------
-        # STATUS
-        # ----------------------------------------------------
-
+        # Status
         self.status = Label(
             text="SYSTEM ONLINE",
             font_size=18,
@@ -117,10 +108,7 @@ class JarvisApp(App):
 
         layout.add_widget(self.status)
 
-        # ----------------------------------------------------
-        # RESPONSE AREA
-        # ----------------------------------------------------
-
+        # Reply
         self.reply = Label(
             text=(
                 "Hello. I am JARVIS.\n\n"
@@ -130,12 +118,10 @@ class JarvisApp(App):
                 "ECE\n"
                 "CSE\n"
                 "robotics\n"
-                "drone\n"
                 "coding\n"
                 "time\n"
                 "date\n"
-                "calculate 25+25\n"
-                "What is a transistor?"
+                "calculate 25+25"
             ),
             font_size=17,
             halign="left",
@@ -149,10 +135,7 @@ class JarvisApp(App):
 
         layout.add_widget(self.reply)
 
-        # ----------------------------------------------------
-        # COMMAND BOX
-        # ----------------------------------------------------
-
+        # Command box
         self.command = TextInput(
             hint_text="Type a command...",
             multiline=False,
@@ -167,45 +150,25 @@ class JarvisApp(App):
 
         layout.add_widget(self.command)
 
-        # ----------------------------------------------------
-        # SEND BUTTON
-        # ----------------------------------------------------
-
-        send_button = Button(
+        # Send button
+        button = Button(
             text="SEND",
             font_size=20,
             size_hint_y=None,
             height=55
         )
 
-        send_button.bind(
+        button.bind(
             on_press=self.process_command
         )
 
-        layout.add_widget(send_button)
-
-        # ----------------------------------------------------
-        # VOICE BUTTON
-        # ----------------------------------------------------
-
-        voice_button = Button(
-            text="🎤 VOICE COMMAND",
-            font_size=20,
-            size_hint_y=None,
-            height=60
-        )
-
-        voice_button.bind(
-            on_press=self.start_voice_command
-        )
-
-        layout.add_widget(voice_button)
+        layout.add_widget(button)
 
         return layout
 
-    # ========================================================
-    # TEXT COMMAND
-    # ========================================================
+    # -----------------------------
+    # Process command
+    # -----------------------------
 
     def process_command(self, instance):
 
@@ -214,36 +177,19 @@ class JarvisApp(App):
         if not command:
             return
 
-        self.run_command(command)
-
-        self.command.text = ""
-
-    # ========================================================
-    # RUN COMMAND
-    # ========================================================
-
-    def run_command(self, command):
-
-        self.status.text = "PROCESSING..."
-
         response = self.get_response(command)
 
         self.reply.text = response
 
-        self.status.text = "SYSTEM ONLINE"
+        self.command.text = ""
 
-        self.speak(response)
-
-    # ========================================================
-    # JARVIS BRAIN
-    # ========================================================
+    # -----------------------------
+    # JARVIS brain
+    # -----------------------------
 
     def get_response(self, command):
 
-        # ----------------------------------------------------
-        # GREETING
-        # ----------------------------------------------------
-
+        # Greeting
         if command in [
             "hi",
             "hello",
@@ -257,20 +203,14 @@ class JarvisApp(App):
                 "How can I assist you?"
             )
 
-        # ----------------------------------------------------
-        # IDENTITY
-        # ----------------------------------------------------
-
+        # Identity
         if "who are you" in command:
 
             return (
                 "I am JARVIS, your personal AI assistant."
             )
 
-        # ----------------------------------------------------
-        # TIME
-        # ----------------------------------------------------
-
+        # Time
         if (
             command == "time"
             or "what time" in command
@@ -285,14 +225,11 @@ class JarvisApp(App):
                 + current_time
             )
 
-        # ----------------------------------------------------
-        # DATE
-        # ----------------------------------------------------
-
+        # Date
         if (
             command == "date"
-            or "today" in command
             or "what date" in command
+            or command == "today"
         ):
 
             current_date = datetime.now().strftime(
@@ -304,15 +241,11 @@ class JarvisApp(App):
                 + current_date
             )
 
-        # ====================================================
         # VLSI
-        # ====================================================
-
         if "vlsi" in command:
 
             return (
                 "VLSI Specialist activated.\n\n"
-
                 "I can help with:\n"
                 "• Digital logic\n"
                 "• Boolean algebra\n"
@@ -322,17 +255,10 @@ class JarvisApp(App):
                 "• Logic gates\n"
                 "• Flip-flops\n"
                 "• Registers\n"
-                "• Counters\n"
-                "• VLSI calculations\n"
-                "• Combinational circuits\n"
-                "• Sequential circuits\n"
-                "• Digital IC design"
+                "• Counters"
             )
 
-        # ====================================================
         # ECE
-        # ====================================================
-
         if (
             command == "ece"
             or "electronics" in command
@@ -340,102 +266,72 @@ class JarvisApp(App):
 
             return (
                 "ECE Specialist activated.\n\n"
-
                 "I can help with:\n"
-                "• Electronic circuits\n"
                 "• Analog electronics\n"
                 "• Digital electronics\n"
                 "• Signals and systems\n"
                 "• Communication systems\n"
                 "• Microprocessors\n"
                 "• Microcontrollers\n"
-                "• Embedded systems\n"
-                "• Semiconductor devices\n"
-                "• Control systems"
+                "• Embedded systems"
             )
 
-        # ====================================================
         # CSE
-        # ====================================================
-
         if (
             command == "cse"
             or "computer science" in command
-            or "computer science engineering" in command
         ):
 
             return (
                 "CSE Specialist activated.\n\n"
-
                 "I can help with:\n"
-                "• Python programming\n"
-                "• C programming\n"
-                "• C++ programming\n"
-                "• Java basics\n"
+                "• Python\n"
+                "• C\n"
+                "• C++\n"
+                "• Java\n"
                 "• Data structures\n"
                 "• Algorithms\n"
-                "• Object-oriented programming\n"
                 "• Databases\n"
                 "• Operating systems\n"
                 "• Computer networks\n"
-                "• Web development\n"
-                "• AI and machine learning\n"
-                "• Software engineering"
+                "• AI and machine learning"
             )
 
-        # ====================================================
-        # ROBOTICS
-        # ====================================================
-
+        # Robotics
         if (
             "robotics" in command
-            or command == "robot"
             or "robot" in command
         ):
 
             return (
                 "Robotics Specialist activated.\n\n"
-
                 "Topics:\n"
                 "• Sensors\n"
                 "• Motors\n"
                 "• Microcontrollers\n"
                 "• Control systems\n"
                 "• Embedded programming\n"
-                "• Robot navigation\n"
-                "• Automation\n"
-                "• Robotics electronics"
+                "• Robot navigation"
             )
 
-        # ====================================================
-        # DRONE EDUCATION
-        # ====================================================
-
+        # Drone
         if "drone" in command:
 
             return (
                 "Drone Education module activated.\n\n"
-
                 "I can explain:\n"
                 "• Drone components\n"
                 "• Flight controllers\n"
                 "• Sensors\n"
-                "• Motors and propellers\n"
+                "• Motors\n"
                 "• ESC concepts\n"
-                "• Battery basics\n"
                 "• GPS concepts\n"
                 "• Stabilization\n"
                 "• Drone electronics\n"
-                "• Flight-control theory\n\n"
-
-                "Guidance is limited to safe "
-                "educational and legal uses."
+                "• Flight-control theory"
             )
 
-        # ====================================================
-        # CODING
-        # ====================================================
-
+        # Coding
         if (
             "coding" in command
             or "programming" in command
@@ -444,7 +340,6 @@ class JarvisApp(App):
 
             return (
                 "Coding Specialist activated.\n\n"
-
                 "I can help with:\n"
                 "• Python\n"
                 "• Programming logic\n"
@@ -452,14 +347,10 @@ class JarvisApp(App):
                 "• Loops\n"
                 "• Functions\n"
                 "• Classes\n"
-                "• Debugging\n"
-                "• AI programming"
+                "• Debugging"
             )
 
-        # ====================================================
-        # TRANSISTOR
-        # ====================================================
-
+        # Transistor
         if (
             "what is transistor" in command
             or "what is a transistor" in command
@@ -468,43 +359,28 @@ class JarvisApp(App):
 
             return (
                 "A transistor is a semiconductor device "
-                "used to amplify or switch electronic signals.\n\n"
-
-                "Main types:\n"
-                "• BJT\n"
-                "• MOSFET\n\n"
-
-                "In VLSI, MOSFETs are fundamental building "
-                "blocks of CMOS digital circuits."
+                "used for switching and amplification.\n\n"
+                "Common types are BJT and MOSFET.\n\n"
+                "MOSFETs are fundamental components "
+                "of modern CMOS VLSI circuits."
             )
 
-        # ====================================================
-        # LOGIC GATES
-        # ====================================================
-
-        if (
-            "logic gate" in command
-            or "logic gates" in command
-        ):
+        # Logic gates
+        if "logic gate" in command:
 
             return (
-                "Logic gates are digital circuits that "
-                "perform Boolean operations.\n\n"
-
-                "Common gates:\n"
-                "• AND\n"
-                "• OR\n"
-                "• NOT\n"
-                "• NAND\n"
-                "• NOR\n"
-                "• XOR\n"
-                "• XNOR"
+                "Logic gates are digital circuits "
+                "that perform Boolean operations.\n\n"
+                "AND\n"
+                "OR\n"
+                "NOT\n"
+                "NAND\n"
+                "NOR\n"
+                "XOR\n"
+                "XNOR"
             )
 
-        # ====================================================
-        # CALCULATOR
-        # ====================================================
-
+        # Calculator
         if command.startswith("calculate "):
 
             expression = command.replace(
@@ -518,8 +394,7 @@ class JarvisApp(App):
                 + calculate(expression)
             )
 
-        # Direct mathematical expression
-
+        # Direct calculation
         if all(
             character in "0123456789+-*/(). %"
             for character in command
@@ -530,10 +405,7 @@ class JarvisApp(App):
                 + calculate(command)
             )
 
-        # ====================================================
-        # HELP
-        # ====================================================
-
+        # Help
         if (
             command == "help"
             or "what can you do" in command
@@ -541,160 +413,33 @@ class JarvisApp(App):
 
             return (
                 "JARVIS command center:\n\n"
-
                 "VLSI\n"
                 "ECE\n"
                 "CSE\n"
                 "robotics\n"
                 "drone\n"
                 "coding\n"
+                "transistor\n"
+                "logic gate\n"
                 "time\n"
                 "date\n"
-                "transistor\n"
-                "logic gates\n"
-                "calculate 100+50\n"
-                "hello\n"
-                "VOICE COMMAND"
+                "calculate 100+50"
             )
 
-        # ====================================================
-        # UNKNOWN COMMAND
-        # ====================================================
-
+        # Unknown
         return (
             "I received your command:\n\n"
             + command
             + "\n\n"
-
             "Try VLSI, ECE, CSE, robotics, "
-            "drone, coding, transistor, "
-            "logic gates, time, date or help."
+            "drone, coding, time, date or help."
         )
 
-    # ========================================================
-    # TEXT TO SPEECH
-    # ========================================================
 
-    def speak(self, text):
-
-        try:
-
-            from jnius import autoclass
-
-            PythonActivity = autoclass(
-                "org.kivy.android.PythonActivity"
-            )
-
-            TextToSpeech = autoclass(
-                "android.speech.tts.TextToSpeech"
-            )
-
-            activity = PythonActivity.mActivity
-
-            def on_init(status):
-
-                if status == TextToSpeech.SUCCESS:
-
-                    tts.speak(
-                        text,
-                        TextToSpeech.QUEUE_FLUSH,
-                        None,
-                        "JARVIS"
-                    )
-
-            tts = TextToSpeech(
-                activity,
-                on_init
-            )
-
-        except Exception:
-
-            # Pydroid terminal does not provide
-            # the same Android JNI environment.
-            pass
-
-    # ========================================================
-    # VOICE COMMAND
-    # ========================================================
-
-    def start_voice_command(self, instance):
-
-        self.status.text = "LISTENING..."
-
-        try:
-
-            from jnius import autoclass
-
-            PythonActivity = autoclass(
-                "org.kivy.android.PythonActivity"
-            )
-
-            Intent = autoclass(
-                "android.content.Intent"
-            )
-
-            RecognizerIntent = autoclass(
-                "android.speech.RecognizerIntent"
-            )
-
-            activity = PythonActivity.mActivity
-
-            intent = Intent(
-                RecognizerIntent.ACTION_RECOGNIZE_SPEECH
-            )
-
-            intent.putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-            )
-
-            intent.putExtra(
-                RecognizerIntent.EXTRA_PROMPT,
-                "Speak to JARVIS"
-            )
-
-            intent.putExtra(
-                RecognizerIntent.EXTRA_MAX_RESULTS,
-                1
-            )
-
-            activity.startActivityForResult(
-                intent,
-                1234
-            )
-
-            self.status.text = "SPEAK NOW"
-
-        except Exception as error:
-
-            self.status.text = "VOICE UNAVAILABLE"
-
-            self.reply.text = (
-                "Voice command needs the Android APK "
-                "version with microphone permission.\n\n"
-                "It cannot reliably use Android speech "
-                "recognition from the Pydroid terminal."
-            )
-
-    # ========================================================
-    # APP START
-    # ========================================================
-
-    def on_start(self):
-
-        Clock.schedule_once(
-            self.initial_message,
-            0.5
-        )
-
-    def initial_message(self, dt):
-
-        self.status.text = "SYSTEM ONLINE"
-
-
-# ============================================================
-# START JARVIS
-# ============================================================
+# -----------------------------
+# Start JARVIS
+# -----------------------------
 
 if __name__ == "__main__":
     JarvisApp().run()
+    
